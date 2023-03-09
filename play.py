@@ -3,6 +3,15 @@
 
 @login_required
 def looks_sure(request, id):
+
+    token = request.META.get('HTTP_AUTHORIZATION')[7:]
+    tokenBackend = TokenBackend(algorithm=settings.SIMPLE_JWT['ALGORITHM'])
+    valid_data = tokenBackend.decode(token,verify=False)
+
+    if valid_data['user_id'] != id:
+        stringResponse = {'detail':'Unauthorized Request'}
+        return Response(stringResponse, status=status.HTTP_401_UNAUTHORIZED)
+
     project_obj = get_object_or_404(Project, pk=int(id))
 
 
